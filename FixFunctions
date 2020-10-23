@@ -1,0 +1,25 @@
+# run with IDA Python
+# scan the .text segment and try to convert instructions to functions.
+
+import idautils
+
+
+def make_functions(start, end):
+    
+    current_ea = start
+    while (current_ea < end):
+        func_end = find_func_end(current_ea)
+        if func_end == 0xffffffff:
+            current_ea += 4
+        else:
+            if get_func_name(current_ea) == "":
+                print("Add func in %s"%(hex(current_ea)))
+                add_func(current_ea, func_end)
+            current_ea = func_end
+
+
+
+for x in idautils.Segments():
+    if (get_segm_name(x) in ['.text']):
+        print("Seek function from %s to %s" % (hex(x), hex(get_segm_end(x))))
+        make_functions(x, get_segm_end(x))
